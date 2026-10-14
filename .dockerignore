@@ -1,0 +1,8 @@
+.env
+.git
+data/
+__pycache__/
+*.pyc
+docs/demo.mp4
+hf/
+.venv/
