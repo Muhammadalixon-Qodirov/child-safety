@@ -1,0 +1,21 @@
+# One-click deploy to Render (https://render.com): New + → Blueprint → point at this repo.
+services:
+  - type: web
+    name: guardian-child-safety
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn backend.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false          # set this in the Render dashboard (secret)
+      - key: GROQ_SAFETY_MODEL
+        value: openai/gpt-oss-safeguard-20b
+      - key: GROQ_TEXT_MODEL
+        value: openai/gpt-oss-20b
+      - key: GROQ_VISION_MODEL
+        value: ""
+      - key: AGENT_KEY
+        generateValue: true
+      - key: RETENTION_DAYS
+        value: "7"

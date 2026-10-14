@@ -193,6 +193,8 @@ def analyze_screen(image_bytes, ocr_text="", ctx=None):
         return result
     seen_text, source, vision = ocr_text, "", None
     try:
+        if not config.GROQ_VISION_MODEL:
+            raise RuntimeError("vision disabled (no multimodal model configured)")
         content = [
             {"type": "text", "text": VISION_PROMPT + f"\nChild age group: {ctx.get('age_group', '10-13')}."},
             {"type": "image_url", "image_url": {"url": _image_to_data_url(image_bytes)}},

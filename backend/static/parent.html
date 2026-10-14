@@ -472,7 +472,9 @@ async function refresh() {
 }
 document.querySelectorAll(".mode-select").forEach(s => s.innerHTML = opt(MODES_ORDER, "home"));
 document.querySelectorAll(".cat-select").forEach(s => s.innerHTML = opt(CATS, "game"));
-let startTab = "overview"; try { startTab = localStorage.getItem("guardian-tab") || "overview"; } catch (e) {}
+let startTab = "overview";
+const urlTab = new URLSearchParams(location.search).get("tab");
+if (urlTab) startTab = urlTab; else try { startTab = localStorage.getItem("guardian-tab") || "overview"; } catch (e) {}
 showTab(startTab);
 // Auto-refresh only views that don't contain inputs being edited.
 setInterval(() => { if (["overview", "alerts", "requests"].includes(current)) refresh(); else api("/api/state").then(s => { S = s; renderHeader(); }); }, 4000);
