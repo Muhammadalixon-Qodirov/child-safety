@@ -423,6 +423,47 @@ async def child_sos(request: Request):
     return {"ok": True, "event_id": ev["id"]}
 
 
+# Safe Typing: checks text the child is about to send, BEFORE it leaves the device.
+# It does not store keystrokes. Only a flagged phrase is kept, and only so the child
+# (and, for the most serious risks, the parent) can see why a warning appeared.
+_typing_hits = {}  # per-category throttle so a parent isn't alerted on every keystroke
+
+
+def _safe_typing_parent_alert(category, snippet):
+    import time as _t
+    now = _t.time()
+    if now - _typing_hits.get(category, 0) < 120:
+        return
+    _typing_hits[category] = now
+    titles = {"PII": "Child was about to share personal info while typing",
+              "GROOMING": "Risky conversation detected while your child was typing",
+              "SELF_HARM": "Your child typed something that may signal distress"}
+    add_event({"source": "typing", "category": category, "risk": 70, "action_taken": "child warned before sending",
+               "title": titles.get(category, "Risky text while typing"),
+               "reason_parent": f"Guardian warned your child before they sent a message. Topic: {category}.",
+               "reason_child": "Guardian gave you a heads-up before you sent that message.",
+               "meta": {"evidence": snippet[:120]}})
+
+
+@app.post("/api/child/type-check")
+async def type_check(request: Request):
+    """Called as the child types. Returns a gentle warning, nothing is stored unless risky."""
+    text = (await request.json()).get("text", "")
+    if len(text) < 8:
+        return {"risk": 0}
+    c = child()
+    res = ai_engine.classify_text(text, {"age_group": c["age_group"], "app": "typing"})
+    if res["risk"] < 40 or res["category"] == "SAFE":
+        return {"risk": res["risk"]}
+    # Only the three categories where a pre-send nudge helps the child directly.
+    if res["category"] not in ("PII", "GROOMING", "SELF_HARM", "BULLYING"):
+        return {"risk": res["risk"], "category": res["category"]}
+    if res["category"] in ("PII", "GROOMING", "SELF_HARM") and res["risk"] >= 60:
+        threading.Thread(target=_safe_typing_parent_alert,
+                         args=(res["category"], res.get("evidence") or text), daemon=True).start()
+    return {"risk": res["risk"], "category": res["category"], "warn": res["reason_child"]}
+
+
 # ------------------------------------------------------------------ pages + background
 @app.get("/")
 def index():

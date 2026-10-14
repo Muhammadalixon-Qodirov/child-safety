@@ -33,6 +33,20 @@
     <div id="limits" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
   </section>
 
+  <section class="card">
+    <div class="flex items-center justify-between mb-1">
+      <h2 class="font-semibold text-lg">⌨️ Safe Typing</h2>
+      <span class="text-xs rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 px-2 py-0.5">checks as you type</span>
+    </div>
+    <p class="text-xs text-slate-500 mb-3">Type a message here like you would in a game or chat. Guardian gives you a friendly heads-up <b>before</b> you send something that could put you at risk — like your address, phone number, or a mean message. Your keystrokes are <b>not</b> saved.</p>
+    <textarea id="type-box" rows="2" class="w-full rounded-2xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2" placeholder="Try typing: my address is ... / which school do you go to / you're such a loser"></textarea>
+    <div id="type-warn" class="mt-2 hidden rounded-2xl p-3 text-sm"></div>
+    <div class="mt-2 flex gap-2">
+      <button id="type-send" class="rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-sm px-4 py-2 font-semibold">Send</button>
+      <span id="type-ok" class="text-xs text-slate-500 self-center"></span>
+    </div>
+  </section>
+
   <section class="grid md:grid-cols-2 gap-4">
     <div class="card">
       <h2 class="font-semibold text-lg mb-1">💡 Why was something paused?</h2>
@@ -153,6 +167,35 @@ document.getElementById("req").onsubmit = async (e) => {
 document.getElementById("focus").onclick = async () => {
   await api("/api/child/focus", { method: "POST", body: { minutes: 25 } });
   toast("Focus mode on — games and chat paused for 25 min 🎯"); refresh();
+};
+// Safe Typing: debounced check while typing; warns before the child sends.
+const typeBox = document.getElementById("type-box");
+const typeWarn = document.getElementById("type-warn");
+let typeTimer, lastWarn = null;
+function showTypeWarn(r) {
+  lastWarn = r && r.warn ? r.category : null;
+  if (!r || !r.warn) { typeWarn.classList.add("hidden"); return; }
+  const strong = r.risk >= 60;
+  typeWarn.className = `mt-2 rounded-2xl p-3 text-sm ${strong ? "bg-red-50 text-red-800 dark:bg-red-950/50 dark:text-red-200" : "bg-amber-50 text-amber-800 dark:bg-amber-950/50 dark:text-amber-200"}`;
+  typeWarn.innerHTML = `<b>${strong ? "⚠️ Wait a second" : "💡 Heads-up"}</b> — ${esc(r.warn)}`;
+}
+typeBox.oninput = () => {
+  document.getElementById("type-ok").textContent = "";
+  clearTimeout(typeTimer);
+  typeTimer = setTimeout(async () => {
+    try { showTypeWarn(await api("/api/child/type-check", { method: "POST", body: { text: typeBox.value } })); }
+    catch (e) {}
+  }, 500);
+};
+document.getElementById("type-send").onclick = async () => {
+  const r = await api("/api/child/type-check", { method: "POST", body: { text: typeBox.value } });
+  if (r.warn && r.risk >= 60) {
+    showTypeWarn(r);
+    if (!confirm("Guardian thinks this message could be risky. Send it anyway?")) return;
+  }
+  typeBox.value = ""; typeWarn.classList.add("hidden");
+  document.getElementById("type-ok").textContent = "Message sent safely ✅";
+  refresh();
 };
 const dlg = document.getElementById("sos-dlg");
 document.getElementById("sos").onclick = () => dlg.showModal();
