@@ -27,6 +27,12 @@ GROQ_VISION_MODEL = os.getenv("GROQ_VISION_MODEL", "meta-llama/llama-4-scout-17b
 GROQ_SAFETY_MODEL = os.getenv("GROQ_SAFETY_MODEL", "openai/gpt-oss-safeguard-20b")
 GROQ_TEXT_MODEL = os.getenv("GROQ_TEXT_MODEL", "openai/gpt-oss-20b")
 
+# Vision (screenshot understanding) currently uses the Gemini API.
+# ROADMAP: this moves to a local, on-device multimodal model so screenshots never leave the computer.
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+GEMINI_BASE_URL = os.getenv("GEMINI_BASE_URL", "https://generativelanguage.googleapis.com/v1beta")
+GEMINI_VISION_MODEL = os.getenv("GEMINI_VISION_MODEL", "gemini-3.5-flash-lite")
+
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
 PUBLIC_URL = os.getenv("PUBLIC_URL", "http://localhost:8000")
 

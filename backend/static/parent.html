@@ -441,8 +441,10 @@ function renderSettings() {
   document.getElementById("set-auto").checked = !!c.auto_block;
   document.getElementById("set-consent").checked = !!c.ai_consent;
   const ai = S.ai;
-  document.getElementById("set-ai").innerHTML = `<b>AI (Groq)</b>: ${ai.enabled ? "🟢 connected" : "⚪ offline keyword mode — add GROQ_API_KEY"}
-    <div class="text-xs text-slate-500">Vision: ${esc(ai.vision_model)} · Safety: ${esc(ai.safety_model)}</div>
+  document.getElementById("set-ai").innerHTML = `<b>AI</b>: ${ai.enabled ? "🟢 Groq connected" : "⚪ offline keyword mode — add GROQ_API_KEY"}
+    <div class="text-xs text-slate-500">Safety: ${esc(ai.safety_model)} (Groq)</div>
+    <div class="text-xs text-slate-500">Vision: ${esc(ai.vision_model)} (${esc(ai.vision_provider)})</div>
+    <div class="text-xs text-amber-600 dark:text-amber-400 mt-1">ℹ️ Vision runs on a cloud API today; the roadmap moves it to a <b>local on-device model</b> so screenshots never leave the computer.</div>
     ${ai.last_error ? `<div class="text-xs text-red-600 mt-1">Last error: ${esc(ai.last_error)}</div>` : ""}`;
   const tg = S.telegram;
   document.getElementById("set-tg").innerHTML = `<b>Telegram</b>: ${!tg.enabled ? "⚪ add TELEGRAM_BOT_TOKEN" : tg.linked ? "🟢 linked" : "🟡 send /start to your bot to link"}`;

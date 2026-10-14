@@ -184,24 +184,51 @@ POLICY:
 """ + POLICY
 
 
+def vision_available():
+    return bool(config.GEMINI_API_KEY) or bool(config.GROQ_VISION_MODEL)
+
+
+def _gemini_vision(image_bytes, ctx):
+    """Reads a screenshot with the Gemini API. Raises on any failure so the caller can fall back."""
+    import base64
+    b64 = base64.b64encode(image_bytes).decode()
+    payload = {
+        "contents": [{"parts": [
+            {"text": VISION_PROMPT + f"\nChild age group: {ctx.get('age_group', '10-13')}."},
+            {"inline_data": {"mime_type": "image/png", "data": b64}},
+        ]}],
+        "generationConfig": {"temperature": 0, "responseMimeType": "application/json", "maxOutputTokens": 900},
+    }
+    url = f"{config.GEMINI_BASE_URL}/models/{config.GEMINI_VISION_MODEL}:generateContent?key={config.GEMINI_API_KEY}"
+    r = httpx.post(url, json=payload, timeout=60)
+    if r.status_code >= 400:
+        raise RuntimeError(f"HTTP {r.status_code} {r.text[:150]}")
+    text = r.json()["candidates"][0]["content"]["parts"][0]["text"]
+    return _parse_json(text)
+
+
 def analyze_screen(image_bytes, ocr_text="", ctx=None):
     """Returns a classification plus the text and source the model saw on screen."""
     ctx = ctx or {}
-    if not enabled():
+    if not enabled() and not config.GEMINI_API_KEY:
         result = heuristic(ocr_text, ctx)
         result.update(text=ocr_text[:800], source=ctx.get("source") or ctx.get("app", ""))
         return result
     seen_text, source, vision = ocr_text, "", None
     try:
-        if not config.GROQ_VISION_MODEL:
-            raise RuntimeError("vision disabled (no multimodal model configured)")
-        content = [
-            {"type": "text", "text": VISION_PROMPT + f"\nChild age group: {ctx.get('age_group', '10-13')}."},
-            {"type": "image_url", "image_url": {"url": _image_to_data_url(image_bytes)}},
-        ]
-        raw = _parse_json(_chat(config.GROQ_VISION_MODEL, [{"role": "user", "content": content}],
-                                max_tokens=900, json_mode=True))
-        vision = _normalize(raw, config.GROQ_VISION_MODEL)
+        if config.GEMINI_API_KEY:
+            raw = _gemini_vision(image_bytes, ctx)
+            vision = _normalize(raw, config.GEMINI_VISION_MODEL)
+        elif config.GROQ_VISION_MODEL:
+            content = [
+                {"type": "text", "text": VISION_PROMPT + f"\nChild age group: {ctx.get('age_group', '10-13')}."},
+                {"type": "image_url", "image_url": {"url": _image_to_data_url(image_bytes)}},
+            ]
+            raw = _parse_json(_chat(config.GROQ_VISION_MODEL, [{"role": "user", "content": content}],
+                                    max_tokens=900, json_mode=True))
+            vision = _normalize(raw, config.GROQ_VISION_MODEL)
+        else:
+            raise RuntimeError("no vision model configured")
         seen_text = (raw.get("text") or "") + ("\n" + ocr_text if ocr_text else "")
         source = str(raw.get("source", ""))[:120]
     except Exception as exc:  # noqa: BLE001

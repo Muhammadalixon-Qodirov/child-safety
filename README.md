@@ -60,10 +60,17 @@ python -m uvicorn backend.main:app --port 8000
 Open <http://localhost:8000>, then press **▶ Run demo scenario** in the parent dashboard.
 Without a Groq key the app still runs in an offline keyword mode.
 
-Models used (set in `.env`, check current ids at <https://console.groq.com/docs/models>):
+Models used (set in `.env`):
 
-- `openai/gpt-oss-safeguard-20b` — policy-following safety classifier (open weights, Apache-2.0)
-- `openai/gpt-oss-20b` — parent advice and weekly digest
+- `openai/gpt-oss-safeguard-20b` on **Groq** — policy-following safety classifier (open weights, Apache-2.0)
+- `openai/gpt-oss-20b` on **Groq** — parent advice and weekly digest
+- `gemini-3.5-flash-lite` on the **Gemini API** — vision: reads the screenshot (text + context) before it is classified
+
+## Roadmap
+
+- **Local, on-device vision.** Screenshot understanding currently uses a cloud vision API. The plan is to replace it with a local multimodal model (e.g. a small open vision-language model) so **images never leave the child's computer** — strengthening the privacy-by-design goal.
+- On-device agent packaged for Windows / macOS / Linux with tamper-resistance.
+- Multi-child families and a shared, anonymised benchmark.
 
 ## Deploy
 
