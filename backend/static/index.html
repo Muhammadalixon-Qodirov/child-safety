@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guardian</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script>tailwind.config = { darkMode: "media" };</script>
+<style>body { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }</style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen">
+<main class="max-w-5xl mx-auto px-4 py-10 space-y-10">
+  <section class="text-center space-y-4">
+    <div class="text-6xl">🛡️</div>
+    <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight">Guardian</h1>
+    <p class="text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">AI that steps in when a child is in danger online — and stays out of the way when they're not.
+      Smart app &amp; site limits, location-aware modes, and risk-only screenshots, with a dashboard for parents <i>and</i> kids.</p>
+    <div class="flex flex-wrap justify-center gap-3 pt-2">
+      <a href="/parent" class="rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-3">👨‍👩‍👧 Parent dashboard</a>
+      <a href="/child" class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 font-semibold px-6 py-3">🧒 Child dashboard</a>
+    </div>
+    <p class="text-xs text-slate-500">Tip: in the parent dashboard press <b>▶ Run demo scenario</b> to watch the AI pipeline work on synthetic screens.</p>
+  </section>
+
+  <section class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+    <div class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5"><div class="text-2xl">🧠</div><h3 class="font-semibold mt-2">Two-stage AI</h3><p class="text-slate-600 dark:text-slate-400 mt-1">A cheap on-device check looks at every screen; only suspicious ones go to Groq vision + a policy-following safety model (gpt-oss-safeguard).</p></div>
+    <div class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5"><div class="text-2xl">📍</div><h3 class="font-semibold mt-2">Wi-Fi zones</h3><p class="text-slate-600 dark:text-slate-400 mt-1">School Wi-Fi turns on school rules; an unknown café network turns on strict mode and tells the parent.</p></div>
+    <div class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5"><div class="text-2xl">🗓️</div><h3 class="font-semibold mt-2">Schedules &amp; limits</h3><p class="text-slate-600 dark:text-slate-400 mt-1">School time, homework, bedtime and per-app daily limits. Apps close automatically; kids can ask for more.</p></div>
+    <div class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5"><div class="text-2xl">📲</div><h3 class="font-semibold mt-2">Telegram in one tap</h3><p class="text-slate-600 dark:text-slate-400 mt-1">Alerts arrive with a blurred screenshot and buttons: keep blocked, it's OK, or "how do I talk about this?".</p></div>
+    <div class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5"><div class="text-2xl">🌱</div><h3 class="font-semibold mt-2">Trust that grows</h3><p class="text-slate-600 dark:text-slate-400 mt-1">Kids earn trust points and bonus time. Being targeted is never punished; only tampering is.</p></div>
+    <div class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5"><div class="text-2xl">🔒</div><h3 class="font-semibold mt-2">Privacy by design</h3><p class="text-slate-600 dark:text-slate-400 mt-1">No constant recording, blurred previews, no storage of adult content, 7-day auto-delete, and full transparency to the child.</p></div>
+  </section>
+</main>
+</body>
+</html>

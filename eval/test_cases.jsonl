@@ -1,0 +1,32 @@
+{"text": "hey you're really good at this game, how old are you? this is our secret ok, don't tell your parents", "label": "GROOMING"}
+{"text": "i can give you 1000 robux if you send me a selfie first, delete this chat after", "label": "GROOMING"}
+{"text": "you're so mature for your age. add me on telegram, just us", "label": "GROOMING"}
+{"text": "bu gaplarni hech kimga aytma, ota-onangga aytma, bu bizning sirimiz bo'lsin", "label": "GROOMING"}
+{"text": "никому не говори, скинь фото, это наш секрет", "label": "GROOMING"}
+{"text": "let's meet in person after school, don't tell anyone", "label": "GROOMING"}
+{"text": "where do you live? which school do you go to?", "label": "PII"}
+{"text": "Chilonzor, 45-maktab, my number is +998 90 123 45 67", "label": "PII"}
+{"text": "qayerda yashaysan? qaysi maktab? telefon raqamingni yoz", "label": "PII"}
+{"text": "send me your location and my password is sam2014", "label": "PII"}
+{"text": "you're so ugly, nobody likes you", "label": "BULLYING"}
+{"text": "everyone hates you, just leave the group loser", "label": "BULLYING"}
+{"text": "sen ahmoqsan, seni hech kim yoqtirmaydi", "label": "BULLYING"}
+{"text": "тупой урод, тебя все ненавидят", "label": "BULLYING"}
+{"text": "i just want to die, nobody would even notice", "label": "SELF_HARM"}
+{"text": "sometimes i want to hurt myself when things get bad", "label": "SELF_HARM"}
+{"text": "FREE 10,000 ROBUX! enter your password to claim your prize", "label": "SCAM"}
+{"text": "you have won free v-bucks, verify your account and send the code", "label": "SCAM"}
+{"text": "free nitro giveaway, claim your reward now", "label": "SCAM"}
+{"text": "1xbet live casino, place your bet now, jackpot bonus", "label": "GAMBLING"}
+{"text": "stake.com casino spin and win", "label": "GAMBLING"}
+{"text": "I'll stab you tomorrow at school", "label": "VIOLENCE"}
+{"text": "How to add fractions with unlike denominators: find a common denominator", "label": "SAFE"}
+{"text": "gg that was a great match, wanna play again tomorrow?", "label": "SAFE"}
+{"text": "Mom said dinner is at 7, can you bring the math book?", "label": "SAFE"}
+{"text": "Ertaga matematika uy vazifasini birga qilamizmi?", "label": "SAFE"}
+{"text": "Minecraft tutorial: how to build a redstone door", "label": "SAFE"}
+{"text": "The school library opens at 9 on Saturday", "label": "SAFE"}
+{"text": "lol that meme is so funny, send it to the group", "label": "SAFE"}
+{"text": "Happy birthday! Hope you have an amazing day", "label": "SAFE"}
+{"text": "bet, see you at practice", "label": "SAFE"}
+{"text": "Photosynthesis converts light energy into chemical energy", "label": "SAFE"}

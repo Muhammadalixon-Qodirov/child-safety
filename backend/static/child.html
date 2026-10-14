@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guardian · My space</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>">
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script>tailwind.config = { darkMode: "media" };</script>
+<script src="/static/common.js"></script>
+<style type="text/tailwindcss">
+  body { font-family: ui-rounded, "SF Pro Rounded", system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .card { @apply rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5; }
+</style>
+</head>
+<body class="bg-gradient-to-b from-sky-50 to-violet-50 dark:from-slate-950 dark:to-slate-950 text-slate-900 dark:text-slate-100 min-h-screen">
+<main class="max-w-4xl mx-auto px-4 py-6 space-y-4">
+
+  <header class="flex flex-wrap items-center gap-3">
+    <h1 class="text-2xl font-bold" id="hello">Hi 👋</h1>
+    <span id="on" class="rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 text-sm px-3 py-1">🛡️ Guardian is on</span>
+    <button id="sos" class="ml-auto rounded-2xl bg-red-600 hover:bg-red-700 text-white font-bold px-5 py-2 shadow-lg shadow-red-600/30">🆘 I need help</button>
+  </header>
+
+  <section class="grid md:grid-cols-3 gap-4">
+    <div class="card md:col-span-2" id="mode"></div>
+    <div class="card" id="trust"></div>
+  </section>
+
+  <section class="card">
+    <div class="flex items-center justify-between mb-3"><h2 class="font-semibold text-lg">⏳ My time today</h2>
+      <button id="focus" class="rounded-xl bg-violet-600 hover:bg-violet-700 text-white text-sm px-3 py-1.5">🎯 Start 25-min focus (+5 pts)</button></div>
+    <div id="limits" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+  </section>
+
+  <section class="grid md:grid-cols-2 gap-4">
+    <div class="card">
+      <h2 class="font-semibold text-lg mb-1">💡 Why was something paused?</h2>
+      <p class="text-xs text-slate-500 mb-3">You're not in trouble. Here's what Guardian noticed and why.</p>
+      <div id="recent" class="space-y-2"></div>
+    </div>
+    <div class="card">
+      <h2 class="font-semibold text-lg mb-3">🙋 Ask my parent</h2>
+      <form id="req" class="space-y-2 text-sm">
+        <select name="kind" id="req-kind" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2">
+          <option value="more_time">More time for an app</option><option value="unblock_app">Open a paused app</option><option value="unblock_site">Visit a website</option></select>
+        <select name="target" id="req-app" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2"></select>
+        <input name="site" id="req-site" placeholder="website.com" class="hidden w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2">
+        <select name="minutes" id="req-min" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2">
+          <option value="15">+15 minutes</option><option value="30">+30 minutes</option><option value="60">+60 minutes</option></select>
+        <input name="reason" placeholder="Why? (e.g. finishing a project with friends)" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2">
+        <button class="w-full rounded-xl bg-sky-600 hover:bg-sky-700 text-white py-2 font-semibold">Send request</button>
+      </form>
+      <div id="my-reqs" class="mt-3 space-y-1 text-sm"></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2 class="font-semibold text-lg mb-3">👀 What Guardian checks — and what it doesn't</h2>
+    <div class="grid sm:grid-cols-2 gap-4 text-sm">
+      <ul class="space-y-1">
+        <li>✅ Which apps are open and for how long (for time limits)</li>
+        <li>✅ Which network you're on (for school / home rules)</li>
+        <li>✅ The screen, <b>only</b> to spot danger: strangers asking for secrets or photos, bullying, scams, adult or gambling sites</li>
+        <li>✅ Your parent gets a message <b>only</b> when something looks risky</li>
+      </ul>
+      <ul class="space-y-1">
+        <li>🚫 No constant recording — safe screens are deleted instantly</li>
+        <li>🚫 Your parent doesn't read all your chats</li>
+        <li>🚫 Nothing is sold or used for ads</li>
+        <li>🗑️ Everything is deleted after 7 days</li>
+        <li>🌳 The more trust you build, the more freedom you get</li>
+      </ul>
+    </div>
+  </section>
+
+  <p class="text-center text-xs text-slate-500 pb-6">Feeling unsafe? Talk to a parent, teacher or another adult you trust. You can also find a free child helpline in your country at <a class="underline" href="https://childhelplineinternational.org/helplines/" target="_blank" rel="noopener">childhelplineinternational.org</a>.</p>
+</main>
+
+<dialog id="sos-dlg" class="rounded-3xl p-0 backdrop:bg-black/50 w-[min(92vw,420px)]">
+  <form method="dialog" class="p-6 space-y-3 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">
+    <h3 class="text-xl font-bold">🆘 Ask for help</h3>
+    <p class="text-sm">Your parent will get a message right away. You can add a few words if you want.</p>
+    <textarea id="sos-msg" rows="3" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-transparent px-3 py-2 text-sm" placeholder="Optional"></textarea>
+    <div class="flex gap-2 justify-end">
+      <button value="cancel" class="rounded-xl border border-slate-300 dark:border-slate-700 px-4 py-2">Cancel</button>
+      <button value="send" class="rounded-xl bg-red-600 text-white px-4 py-2 font-semibold">Send for help</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+let S = null;
+async function refresh() {
+  try { S = await api("/api/child/state"); } catch (e) { return; }
+  document.getElementById("hello").textContent = `Hi ${S.name} 👋`;
+  const on = document.getElementById("on");
+  on.textContent = S.online ? "🛡️ Guardian is on" : "🛡️ Guardian (computer offline)";
+  const m = S.mode_info;
+  const focusLeft = S.focus_until * 1000 - Date.now();
+  document.getElementById("mode").innerHTML = `
+    <div class="flex items-center gap-4"><div class="text-5xl">${m.icon}</div><div>
+      <div class="text-sm text-slate-500">Right now · 📍 ${esc(S.zone)}</div>
+      <div class="text-2xl font-bold">${esc(m.label)}</div>
+      <div class="text-sm text-slate-600 dark:text-slate-300">${esc(m.about)}</div>
+      ${m.apps.length ? `<div class="text-xs text-slate-500 mt-1">Paused now: ${m.apps.join(", ")} apps</div>` : ""}
+      ${focusLeft > 0 ? `<div class="text-sm text-violet-600 dark:text-violet-400 mt-1">🎯 Focus: ${Math.ceil(focusLeft / 60000)} min left</div>` : ""}
+    </div></div>`;
+  const t = S.trust;
+  const lo = t.points < 50 ? 0 : t.points < 100 ? 50 : 100, hi = t.next_at || t.points;
+  const pct = t.next_at ? Math.round(100 * (t.points - lo) / (hi - lo)) : 100;
+  document.getElementById("trust").innerHTML = `
+    <div class="text-sm text-slate-500">My trust level</div>
+    <div class="text-2xl font-bold">${t.icon} ${t.name}</div>
+    <div class="h-3 mt-2 rounded-full bg-slate-200 dark:bg-slate-800"><div class="h-3 rounded-full bg-gradient-to-r from-emerald-400 to-green-600" style="width:${pct}%"></div></div>
+    <div class="text-xs text-slate-500 mt-1">${t.points} pts${t.next_at ? ` · ${t.next_at - t.points} more to ${t.next_name}` : " · max level!"}</div>
+    <div class="text-xs mt-2">${t.bonus_minutes ? `🎁 Bonus: +${t.bonus_minutes} min on every limit` : "🎁 Reach 🌿 Sprout for +10 bonus minutes"}</div>
+    <div class="text-xs text-slate-500 mt-1">Earn points by staying safe and using focus mode.</div>`;
+  document.getElementById("limits").innerHTML = S.limits.map(l => {
+    const total = l.limit_minutes * 60 + t.bonus_minutes * 60, left = l.seconds_left;
+    const pct = Math.max(0, Math.min(100, Math.round(100 * left / Math.max(total, 1))));
+    const paused = m.apps.includes(l.category);
+    return `<div class="rounded-2xl bg-slate-50 dark:bg-slate-800/50 p-3">
+      <div class="flex justify-between font-medium"><span>${esc(l.name)}</span><span class="${left <= 0 ? "text-red-600" : ""}">${left <= 0 ? "Time's up" : fmtMin(left) + " left"}</span></div>
+      <div class="h-2 mt-2 rounded-full bg-slate-200 dark:bg-slate-700"><div class="h-2 rounded-full ${pct < 15 ? "bg-red-500" : "bg-sky-500"}" style="width:${pct}%"></div></div>
+      ${paused ? `<div class="text-xs text-slate-500 mt-1">${m.icon} paused during ${esc(m.label)}</div>` : ""}</div>`;
+  }).join("") || `<p class="text-sm text-slate-500">No time limits today.</p>`;
+  document.getElementById("recent").innerHTML = S.recent.map(r => `
+    <div class="rounded-2xl bg-slate-50 dark:bg-slate-800/50 p-3 text-sm">
+      <div class="flex items-center gap-2">${catBadge(r.category)}<span class="text-xs text-slate-500">${r.ts_h}</span></div>
+      <p class="mt-1">${esc(r.reason_child || r.title)}</p></div>`).join("") || `<p class="text-sm text-slate-500">Nothing paused. Nice! 🌟</p>`;
+  const st = { pending: "⏳ waiting", approved: "✅ approved", denied: "❌ not this time" };
+  document.getElementById("my-reqs").innerHTML = S.requests.map(r => `<div class="flex justify-between"><span>${r.kind === "more_time" ? `+${r.minutes}m ${esc(r.target)}` : esc(r.target)}</span><span>${st[r.status]}</span></div>`).join("");
+  const appSel = document.getElementById("req-app");
+  if (!appSel.options.length) appSel.innerHTML = S.blockable.map(a => `<option>${esc(a)}</option>`).join("");
+}
+
+const kind = document.getElementById("req-kind");
+kind.onchange = () => {
+  const site = kind.value === "unblock_site";
+  document.getElementById("req-app").classList.toggle("hidden", site);
+  document.getElementById("req-site").classList.toggle("hidden", !site);
+  document.getElementById("req-min").classList.toggle("hidden", kind.value !== "more_time");
+};
+document.getElementById("req").onsubmit = async (e) => {
+  e.preventDefault();
+  const f = Object.fromEntries(new FormData(e.target));
+  const target = f.kind === "unblock_site" ? f.site : f.target;
+  if (!target) return toast("Pick an app or website");
+  await api("/api/child/request", { method: "POST", body: { kind: f.kind, target, minutes: f.kind === "more_time" ? +f.minutes : 0, reason: f.reason } });
+  e.target.reason.value = ""; toast("Sent to your parent 📨"); refresh();
+};
+document.getElementById("focus").onclick = async () => {
+  await api("/api/child/focus", { method: "POST", body: { minutes: 25 } });
+  toast("Focus mode on — games and chat paused for 25 min 🎯"); refresh();
+};
+const dlg = document.getElementById("sos-dlg");
+document.getElementById("sos").onclick = () => dlg.showModal();
+dlg.addEventListener("close", async () => {
+  if (dlg.returnValue !== "send") return;
+  await api("/api/child/sos", { method: "POST", body: { message: document.getElementById("sos-msg").value } });
+  document.getElementById("sos-msg").value = "";
+  toast("Your parent has been told. You did the right thing. 💙");
+});
+refresh();
+setInterval(refresh, 4000);
+</script>
+</body>
+</html>

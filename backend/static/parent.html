@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guardian · Parent</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script>tailwind.config = { darkMode: "media" };</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="/static/common.js"></script>
+<style type="text/tailwindcss">
+  body { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .card { @apply rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4; }
+  input, select { color: inherit; }
+</style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen">
+
+<header class="sticky top-0 z-30 bg-white/90 dark:bg-slate-900/90 backdrop-blur border-b border-slate-200 dark:border-slate-800">
+  <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center gap-3">
+    <a href="/" class="font-bold text-lg">🛡️ Guardian</a>
+    <span class="text-xs rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 px-2 py-0.5">Parent</span>
+    <span id="hdr-status" class="text-sm text-slate-500"></span>
+    <div class="ml-auto flex items-center gap-2">
+      <div class="relative">
+        <button id="demo-btn" class="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-3 py-1.5">▶ Run demo scenario</button>
+        <div id="demo-menu" class="hidden absolute right-0 mt-2 w-64 rounded-xl bg-white dark:bg-slate-800 shadow-xl border border-slate-200 dark:border-slate-700 p-1 text-sm">
+          <p class="px-3 py-2 text-xs text-slate-500">Sends a synthetic screenshot through the real AI pipeline.</p>
+          <button data-demo="grooming" class="demo w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">🚨 Stranger asks for secrets & selfie</button>
+          <button data-demo="pii" class="demo w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">🔐 Child shares school & phone</button>
+          <button data-demo="bullying" class="demo w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">💬 Group chat bullying</button>
+          <button data-demo="scam" class="demo w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">🎣 "Free Robux" scam page</button>
+          <button data-demo="gambling" class="demo w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">🎰 Betting site</button>
+          <button data-demo="safe" class="demo w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">✅ Homework page (safe)</button>
+        </div>
+      </div>
+      <a href="/child" target="_blank" class="rounded-xl border border-slate-300 dark:border-slate-700 text-sm px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800">Child view ↗</a>
+    </div>
+  </div>
+  <nav class="max-w-6xl mx-auto px-4 flex gap-1 overflow-x-auto text-sm" id="tabs">
+    <button data-tab="overview" class="tab px-3 py-2 border-b-2">Overview</button>
+    <button data-tab="alerts" class="tab px-3 py-2 border-b-2">Alerts <span id="badge-alerts"></span></button>
+    <button data-tab="rules" class="tab px-3 py-2 border-b-2">Apps & Sites</button>
+    <button data-tab="zones" class="tab px-3 py-2 border-b-2">Zones & Schedules</button>
+    <button data-tab="requests" class="tab px-3 py-2 border-b-2">Requests <span id="badge-req"></span></button>
+    <button data-tab="settings" class="tab px-3 py-2 border-b-2">Settings & Privacy</button>
+  </nav>
+</header>
+
+<main class="max-w-6xl mx-auto px-4 py-6">
+
+  <!-- OVERVIEW -->
+  <section data-panel="overview" class="panel space-y-4">
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-3" id="ov-cards"></div>
+    <div class="grid lg:grid-cols-3 gap-4">
+      <div class="card lg:col-span-2">
+        <div class="flex items-center justify-between mb-2"><h2 class="font-semibold">Screen time this week</h2><span class="text-xs text-slate-500">minutes by category</span></div>
+        <canvas id="week-chart" height="120"></canvas>
+      </div>
+      <div class="card">
+        <h2 class="font-semibold mb-3">Today's limits</h2>
+        <div id="ov-limits" class="space-y-3 text-sm"></div>
+      </div>
+    </div>
+    <div class="grid lg:grid-cols-3 gap-4">
+      <div class="card lg:col-span-2">
+        <div class="flex items-center justify-between mb-2"><h2 class="font-semibold">Latest alerts</h2><button class="text-sm text-indigo-600 dark:text-indigo-400" onclick="showTab('alerts')">See all →</button></div>
+        <div id="ov-alerts" class="divide-y divide-slate-100 dark:divide-slate-800"></div>
+      </div>
+      <div class="card">
+        <h2 class="font-semibold mb-1">AI weekly digest</h2>
+        <p class="text-xs text-slate-500 mb-3">A calm summary instead of reading every chat.</p>
+        <button id="report-btn" class="rounded-xl bg-slate-900 dark:bg-white dark:text-slate-900 text-white text-sm px-3 py-1.5">Generate digest</button>
+        <div id="report" class="mt-3 text-sm whitespace-pre-wrap leading-relaxed"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ALERTS -->
+  <section data-panel="alerts" class="panel hidden space-y-3">
+    <div class="flex flex-wrap items-center gap-3">
+      <h2 class="font-semibold text-lg">Alerts</h2>
+      <select id="alert-filter" class="rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent text-sm px-2 py-1">
+        <option value="30">Risk ≥ 30</option><option value="60">Risk ≥ 60 (alerts)</option><option value="0">Everything</option>
+      </select>
+      <p class="text-xs text-slate-500">Screenshots are taken only when the AI flags risk, shown blurred, and deleted after 7 days. Adult content is never stored.</p>
+    </div>
+    <div id="alert-list" class="space-y-3"></div>
+  </section>
+
+  <!-- RULES -->
+  <section data-panel="rules" class="panel hidden space-y-4">
+    <div class="card overflow-x-auto">
+      <div class="flex items-center justify-between mb-3"><h2 class="font-semibold">Apps</h2><span class="text-xs text-slate-500">Matched by process name on the child's computer</span></div>
+      <table class="w-full text-sm"><thead class="text-left text-slate-500 text-xs uppercase"><tr>
+        <th class="py-1">App</th><th>Process names</th><th>Category</th><th>Rule</th><th>Daily limit</th><th>Used today</th><th></th></tr></thead>
+        <tbody id="apps-body"></tbody></table>
+      <form id="app-add" class="mt-3 flex flex-wrap gap-2 text-sm">
+        <input name="name" placeholder="App name" required class="rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent px-2 py-1">
+        <input name="match" placeholder="process e.g. fortnite" required class="rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent px-2 py-1">
+        <select name="category" class="cat-select rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent px-2 py-1"></select>
+        <button class="rounded-lg bg-indigo-600 text-white px-3 py-1">+ Add app</button>
+      </form>
+    </div>
+    <div class="grid lg:grid-cols-2 gap-4">
+      <div class="card">
+        <h2 class="font-semibold">Websites</h2>
+        <p class="text-xs text-slate-500 mb-3"><b>Block</b> = always. <b>By mode</b> = blocked during school, homework and bedtime. <b>Allow</b> = never blocked.</p>
+        <div id="sites-body" class="space-y-1 text-sm"></div>
+        <form id="site-add" class="mt-3 flex flex-wrap gap-2 text-sm">
+          <input name="domain" placeholder="example.com" required class="rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent px-2 py-1">
+          <select name="category" class="rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent px-2 py-1">
+            <option>social</option><option>video</option><option>game</option><option>gambling</option><option>adult</option><option>other</option></select>
+          <button class="rounded-lg bg-indigo-600 text-white px-3 py-1">+ Add</button>
+        </form>
+      </div>
+      <div class="card">
+        <h2 class="font-semibold">Paused by AI or by you</h2>
+        <p class="text-xs text-slate-500 mb-3">High-risk detections pause the app or site for 2 hours automatically.</p>
+        <div id="temp-body" class="space-y-1 text-sm"></div>
+        <h3 class="font-semibold mt-4 mb-1 text-sm">Sites blocked right now</h3>
+        <div id="blocked-now" class="flex flex-wrap gap-1 text-xs"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ZONES -->
+  <section data-panel="zones" class="panel hidden space-y-4">
+    <div class="card">
+      <h2 class="font-semibold">📍 Wi-Fi zones</h2>
+      <p class="text-xs text-slate-500 mb-3">The computer knows where it is by the network it joins. School Wi-Fi switches on school rules automatically; an unknown network switches on strict mode and alerts you.</p>
+      <div id="net-now" class="mb-3 text-sm"></div>
+      <div id="zones-body" class="space-y-2 text-sm"></div>
+      <form id="zone-add" class="mt-3 flex flex-wrap gap-2 text-sm">
+        <input name="name" placeholder="Zone name (Grandma's)" required class="rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent px-2 py-1">
+        <input name="network" placeholder="Wi-Fi / network name" required class="rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent px-2 py-1">
+        <select name="mode" class="mode-select rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent px-2 py-1"></select>
+        <button class="rounded-lg bg-indigo-600 text-white px-3 py-1">+ Add zone</button>
+      </form>
+    </div>
+    <div class="card overflow-x-auto">
+      <h2 class="font-semibold">🗓️ Schedules</h2>
+      <p class="text-xs text-slate-500 mb-3">When several rules apply, the strictest wins: Bedtime › School › Homework/Focus › Unknown network › Home. SOS always works.</p>
+      <div id="sched-body" class="space-y-2 text-sm"></div>
+      <form id="sched-add" class="mt-3 flex flex-wrap gap-2 text-sm">
+        <input name="name" placeholder="Name" required class="rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent px-2 py-1">
+        <select name="mode" class="mode-select rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent px-2 py-1"></select>
+        <input name="start" type="time" value="19:00" class="rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent px-2 py-1">
+        <input name="end" type="time" value="20:00" class="rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent px-2 py-1">
+        <button class="rounded-lg bg-indigo-600 text-white px-3 py-1">+ Add schedule</button>
+      </form>
+    </div>
+    <div class="card"><h2 class="font-semibold mb-2">What each mode does</h2><div id="mode-help" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-2 text-sm"></div></div>
+  </section>
+
+  <!-- REQUESTS -->
+  <section data-panel="requests" class="panel hidden space-y-3">
+    <h2 class="font-semibold text-lg">Requests from your child</h2>
+    <p class="text-xs text-slate-500">Also delivered to Telegram with Approve / Deny buttons.</p>
+    <div id="req-list" class="space-y-2"></div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section data-panel="settings" class="panel hidden grid lg:grid-cols-2 gap-4">
+    <div class="card space-y-3 text-sm">
+      <h2 class="font-semibold">Child profile</h2>
+      <label class="block">Name <input id="set-name" class="ml-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent px-2 py-1"></label>
+      <label class="block">Age group
+        <select id="set-age" class="ml-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent px-2 py-1"><option>6-9</option><option>10-13</option><option>14-17</option></select></label>
+      <p class="text-xs text-slate-500">Younger children get stricter AI scoring.</p>
+      <label class="flex items-center gap-2"><input type="checkbox" id="set-auto"> AI may pause an app or site on its own when risk ≥ 80</label>
+      <label class="flex items-center gap-2"><input type="checkbox" id="set-consent"> Allow AI review of suspicious screenshots</label>
+      <p class="text-xs text-slate-500">When on, a screenshot is sent to the AI provider (Groq) only after the on-device check flags it. Safe screenshots are discarded immediately.</p>
+    </div>
+    <div class="card space-y-3 text-sm">
+      <h2 class="font-semibold">Connections</h2>
+      <div id="set-ai"></div>
+      <div id="set-tg"></div>
+      <div id="set-agent"></div>
+    </div>
+    <div class="card text-sm lg:col-span-2">
+      <h2 class="font-semibold mb-2">🔒 Privacy by design</h2>
+      <ul class="list-disc pl-5 space-y-1 text-slate-600 dark:text-slate-300">
+        <li>No constant recording: screenshots are kept only when the AI flags risk (≥ 60).</li>
+        <li>Parents see blurred previews first and the AI's explanation, not full chat logs.</li>
+        <li>Adult or sexual content is never saved or forwarded; you get a text alert only.</li>
+        <li>Everything is deleted automatically after 7 days. No ads, no third-party trackers.</li>
+        <li>Your child can always see what Guardian checks in their own dashboard.</li>
+        <li>Children are never penalised for being targeted: only tampering lowers their trust score.</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<script>
+const MODES_ORDER = ["home", "school", "homework", "downtime", "strict"];
+const CATS = ["game", "social", "video", "browser", "education", "vpn", "other"];
+let S = null, chart = null, current = "overview";
+
+function showTab(name) {
+  current = name;
+  document.querySelectorAll(".panel").forEach(p => p.classList.toggle("hidden", p.dataset.panel !== name));
+  document.querySelectorAll(".tab").forEach(t => {
+    const on = t.dataset.tab === name;
+    t.classList.toggle("border-indigo-600", on); t.classList.toggle("text-indigo-600", on);
+    t.classList.toggle("dark:text-indigo-400", on); t.classList.toggle("border-transparent", !on);
+  });
+  try { localStorage.setItem("guardian-tab", name); } catch (e) {}
+  refresh();
+}
+document.querySelectorAll(".tab").forEach(t => t.onclick = () => showTab(t.dataset.tab));
+
+document.getElementById("demo-btn").onclick = () => document.getElementById("demo-menu").classList.toggle("hidden");
+document.querySelectorAll(".demo").forEach(b => b.onclick = async () => {
+  document.getElementById("demo-menu").classList.add("hidden");
+  toast("Analyzing screenshot with AI…");
+  try {
+    const r = await api(`/api/demo/${b.dataset.demo}`, { method: "POST" });
+    toast(r.risk >= 30 ? `${r.category} · risk ${r.risk}${r.block ? " · paused " + r.block.target : ""}` : "Safe — screenshot discarded, nothing stored");
+    showTab(r.risk >= 30 ? "alerts" : "overview");
+  } catch (e) { toast("Error: " + e.message); }
+});
+
+function card(title, value, sub, extra = "") {
+  return `<div class="card ${extra}"><div class="text-xs text-slate-500">${title}</div><div class="text-xl font-semibold mt-1">${value}</div><div class="text-xs text-slate-500 mt-1">${sub}</div></div>`;
+}
+
+function renderHeader() {
+  const s = S;
+  const dot = s.online ? `<span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>` : `<span class="inline-block w-2 h-2 rounded-full bg-slate-400"></span>`;
+  document.getElementById("hdr-status").innerHTML = `${dot} ${esc(s.child.name)} · ${s.mode_info.icon} ${esc(s.mode_info.label)}`;
+  document.getElementById("badge-alerts").innerHTML = s.alerts_today ? `<span class="ml-1 rounded-full bg-red-500 text-white text-xs px-1.5">${s.alerts_today}</span>` : "";
+  document.getElementById("badge-req").innerHTML = s.pending_requests ? `<span class="ml-1 rounded-full bg-amber-500 text-white text-xs px-1.5">${s.pending_requests}</span>` : "";
+}
+
+async function renderOverview() {
+  const s = S, w = s.weather;
+  const ago = s.last_seen ? Math.round(Date.now() / 1000 - s.last_seen) : null;
+  document.getElementById("ov-cards").innerHTML =
+    card("Safety today", `${w.icon} ${w.label}`, `${s.alerts_today} alert(s) in 24h`) +
+    card("Mode now", `${s.mode_info.icon} ${esc(s.mode_info.label)}`, esc(s.mode_reason || s.mode_info.about)) +
+    card("Location", `📍 ${esc(s.zone)}`, s.child.network ? `network: ${esc(s.child.network)}` : "no network reported") +
+    card("Protection", s.online ? "🟢 Active" : "⚪ Offline", ago == null ? "agent not connected yet" : `last check ${ago < 60 ? ago + "s" : Math.round(ago / 60) + "m"} ago`) +
+    card("Trust level", `${s.trust.icon} ${s.trust.name}`, `${s.trust.points} pts${s.trust.next_at ? ` · ${s.trust.next_at - s.trust.points} to ${s.trust.next_name}` : ""}`, "col-span-2 lg:col-span-1");
+
+  document.getElementById("ov-limits").innerHTML = s.usage.filter(u => u.action === "limit").map(u => {
+    const total = (u.limit_minutes + u.extra + s.trust.bonus_minutes) * 60;
+    const pct = Math.min(100, Math.round(100 * u.seconds / Math.max(total, 1)));
+    return `<div><div class="flex justify-between"><span>${esc(u.name)}</span><span class="text-slate-500">${fmtMin(u.seconds)} / ${fmtMin(total)}</span></div>
+      <div class="h-2 mt-1 rounded bg-slate-200 dark:bg-slate-800"><div class="h-2 rounded ${pct >= 100 ? "bg-red-500" : pct > 80 ? "bg-amber-500" : "bg-indigo-500"}" style="width:${pct}%"></div></div></div>`;
+  }).join("") || `<p class="text-slate-500">No limits set.</p>`;
+
+  const evs = await api("/api/events?limit=5&min_risk=30");
+  document.getElementById("ov-alerts").innerHTML = evs.map(e => `
+    <div class="py-2 flex items-center gap-3 text-sm cursor-pointer" onclick="showTab('alerts')">
+      ${catBadge(e.category)}<span class="flex-1 truncate">${esc(e.title)}</span>${riskBar(e.risk)}<span class="text-xs text-slate-500 w-16 text-right">${e.ts_h}</span></div>`).join("")
+    || `<p class="text-sm text-slate-500 py-2">Nothing risky detected. 🎉 Try “Run demo scenario”.</p>`;
+
+  const wk = await api("/api/usage/week");
+  const cats = [...new Set(wk.rows.map(r => r.category))];
+  const palette = { game: "#6366f1", social: "#f59e0b", video: "#ef4444", browser: "#0ea5e9", education: "#10b981", other: "#94a3b8" };
+  const data = {
+    labels: wk.days.map(d => new Date(d + "T12:00").toLocaleDateString(undefined, { weekday: "short" })),
+    datasets: cats.map(c => ({ label: c, backgroundColor: palette[c] || "#94a3b8", borderRadius: 4,
+      data: wk.days.map(d => Math.round((wk.rows.find(r => r.day === d && r.category === c)?.seconds || 0) / 60)) })),
+  };
+  const dark = matchMedia("(prefers-color-scheme: dark)").matches;
+  const grid = dark ? "#1e293b" : "#e2e8f0", tick = dark ? "#94a3b8" : "#64748b";
+  if (!chart) {
+    chart = new Chart(document.getElementById("week-chart"), { type: "bar", data, options: {
+      animation: false, plugins: { legend: { labels: { color: tick, boxWidth: 10 } } },
+      scales: { x: { stacked: true, grid: { display: false }, ticks: { color: tick } }, y: { stacked: true, grid: { color: grid }, ticks: { color: tick } } } } });
+  } else { chart.data = data; chart.update(); }
+}
+
+let lastAlertSig = "";
+async function renderAlerts() {
+  const min = document.getElementById("alert-filter").value;
+  const evs = await api(`/api/events?limit=60&min_risk=${min}`);
+  const sig = min + evs.map(e => e.id + e.status).join(",");
+  if (sig === lastAlertSig) return;  // keep revealed images / advice in place
+  lastAlertSig = sig;
+  document.getElementById("alert-list").innerHTML = evs.map(e => `
+    <article class="card flex flex-col md:flex-row gap-4" id="ev-${e.id}">
+      ${e.has_shot ? `<div class="md:w-64 shrink-0"><img src="/api/shots/${e.id}" class="rounded-xl w-full border border-slate-200 dark:border-slate-800" alt="blurred screenshot">
+        <button class="mt-1 text-xs text-indigo-600 dark:text-indigo-400" onclick="reveal(${e.id})">👁 Reveal original</button></div>`
+        : `<div class="md:w-64 shrink-0 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs text-slate-500 p-6 text-center">${e.category === "ADULT" ? "No image stored for adult content" : "No screenshot"}</div>`}
+      <div class="flex-1 min-w-0 space-y-2">
+        <div class="flex flex-wrap items-center gap-2">${catBadge(e.category)}<span class="font-semibold">${esc(e.title)}</span>
+          <span class="text-xs text-slate-500">${e.ts_h} · ${esc(e.source)}</span>
+          ${e.status !== "new" ? `<span class="text-xs rounded-full bg-slate-100 dark:bg-slate-800 px-2">${esc(e.status)}</span>` : ""}</div>
+        ${riskBar(e.risk)}
+        <p class="text-sm">${esc(e.reason_parent)}</p>
+        ${e.meta.evidence ? `<p class="text-xs text-slate-500">Evidence: “${esc(e.meta.evidence)}”</p>` : ""}
+        <p class="text-xs text-slate-500">Action: <b>${esc(e.action_taken)}</b>${e.meta.engine ? ` · AI: ${esc(e.meta.engine)}` : ""}</p>
+        <div class="flex flex-wrap gap-2 pt-1">
+          ${e.target ? `<button onclick="decide(${e.id},'block')" class="rounded-lg bg-red-600 text-white text-xs px-3 py-1.5">⛔ Block ${esc(e.target)} 24h</button>
+          <button onclick="decide(${e.id},'ok')" class="rounded-lg border border-slate-300 dark:border-slate-700 text-xs px-3 py-1.5">✅ It's OK</button>` : ""}
+          ${e.risk >= 30 ? `<button onclick="advice(${e.id})" class="rounded-lg bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 text-xs px-3 py-1.5">💬 How do I talk about this?</button>` : ""}
+        </div>
+        <div id="adv-${e.id}" class="text-sm whitespace-pre-wrap"></div>
+      </div>
+    </article>`).join("") || `<p class="text-sm text-slate-500">No alerts yet.</p>`;
+}
+document.getElementById("alert-filter").onchange = renderAlerts;
+
+function reveal(id) {
+  if (!confirm("Show the unblurred screenshot? Consider talking with your child first.")) return;
+  document.querySelector(`#ev-${id} img`).src = `/api/shots/${id}?original=1`;
+}
+async function decide(id, decision) {
+  const r = await api(`/api/events/${id}/decision`, { method: "POST", body: { decision } });
+  toast(r.result); lastAlertSig = ""; refresh();
+}
+async function advice(id) {
+  const el = document.getElementById(`adv-${id}`);
+  el.innerHTML = `<p class="text-slate-500">Thinking…</p>`;
+  const r = await api(`/api/events/${id}/advice`);
+  el.innerHTML = `<div class="rounded-xl bg-indigo-50 dark:bg-indigo-950/50 p-3">${esc(r.advice)}</div>`;
+}
+
+const opt = (list, sel) => list.map(v => `<option ${v === sel ? "selected" : ""}>${v}</option>`).join("");
+const inputCls = "rounded-lg border border-slate-300 dark:border-slate-700 bg-transparent px-2 py-1";
+
+async function save(table, id, field, value) {
+  await api(`/api/${table}/${id}`, { method: "PUT", body: { [field]: value } });
+  toast("Saved"); refresh();
+}
+async function del(table, id) { await api(`/api/${table}/${id}`, { method: "DELETE" }); toast("Removed"); refresh(); }
+
+async function renderRules() {
+  const used = Object.fromEntries(S.usage.map(u => [u.id, u.seconds]));
+  const apps = await api("/api/apps");
+  document.getElementById("apps-body").innerHTML = apps.map(a => `
+    <tr class="border-t border-slate-100 dark:border-slate-800">
+      <td class="py-1.5 font-medium">${esc(a.name)}</td>
+      <td><input class="${inputCls} w-40 text-xs" value="${esc(a.match)}" onchange="save('apps',${a.id},'match',this.value)"></td>
+      <td><select class="${inputCls}" onchange="save('apps',${a.id},'category',this.value)">${opt(CATS, a.category)}</select></td>
+      <td><select class="${inputCls}" onchange="save('apps',${a.id},'action',this.value)">${opt(["allow", "limit", "block"], a.action)}</select></td>
+      <td>${a.action === "limit" ? `<input type="number" min="5" step="5" class="${inputCls} w-20" value="${a.limit_minutes}" onchange="save('apps',${a.id},'limit_minutes',+this.value)"> min` : `<span class="text-slate-400">—</span>`}</td>
+      <td class="text-slate-500">${fmtMin(used[a.id] || 0)}</td>
+      <td><button class="text-slate-400 hover:text-red-600" onclick="del('apps',${a.id})">✕</button></td></tr>`).join("");
+
+  const sites = await api("/api/sites");
+  const label = { block: "Block", mode: "By mode", allow: "Allow" };
+  document.getElementById("sites-body").innerHTML = sites.map(s => `
+    <div class="flex items-center gap-2"><span class="flex-1">${esc(s.domain)} <span class="text-xs text-slate-500">${esc(s.category)}</span></span>
+      <select class="${inputCls} text-xs" onchange="save('sites',${s.id},'action',this.value)">${["block", "mode", "allow"].map(v => `<option value="${v}" ${v === s.action ? "selected" : ""}>${label[v]}</option>`).join("")}</select>
+      <button class="text-slate-400 hover:text-red-600" onclick="del('sites',${s.id})">✕</button></div>`).join("");
+
+  document.getElementById("temp-body").innerHTML = S.temp_blocks.map(t => `
+    <div class="flex items-center gap-2"><span class="flex-1">${t.kind === "site" ? "🌐" : "🧩"} ${esc(t.target)} <span class="text-xs text-slate-500">${esc(t.reason)} · until ${new Date(t.until * 1000).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span></span>
+      <button class="text-xs text-indigo-600 dark:text-indigo-400" onclick="del('temp_blocks',${t.id})">Lift</button></div>`).join("") || `<p class="text-slate-500">Nothing paused.</p>`;
+  document.getElementById("blocked-now").innerHTML = S.blocked_sites.map(d => `<span class="rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5">${esc(d)}</span>`).join("");
+}
+
+async function addForm(id, table, extra = {}) {
+  document.getElementById(id).onsubmit = async (ev) => {
+    ev.preventDefault();
+    const body = { ...Object.fromEntries(new FormData(ev.target)), ...extra };
+    await api(`/api/${table}`, { method: "POST", body });
+    ev.target.reset(); toast("Added"); refresh();
+  };
+}
+addForm("app-add", "apps", { action: "limit", limit_minutes: 30 });
+addForm("site-add", "sites", { action: "block" });
+addForm("zone-add", "zones");
+addForm("sched-add", "schedules", { days: "0123456" });
+
+async function addCurrentNetwork() {
+  await api("/api/zones", { method: "POST", body: { name: "Home", network: S.child.network, mode: "home" } });
+  toast("Network saved as a zone"); refresh();
+}
+
+async function renderZones() {
+  const net = S.child.network;
+  document.getElementById("net-now").innerHTML = net
+    ? `Child's computer is on <b>${esc(net)}</b> → zone <b>${esc(S.zone)}</b>. ${S.zone === "Unknown network" ? `<button class="ml-2 text-indigo-600 dark:text-indigo-400" onclick="addCurrentNetwork()">+ Save this network as Home</button>` : ""}`
+    : `<span class="text-slate-500">Waiting for the agent to report a network…</span>`;
+  const zones = await api("/api/zones");
+  document.getElementById("zones-body").innerHTML = zones.map(z => `
+    <div class="flex flex-wrap items-center gap-2 rounded-xl bg-slate-50 dark:bg-slate-800/50 p-2">
+      <span class="text-lg">${S.modes[z.mode]?.icon || "📍"}</span><b class="w-28">${esc(z.name)}</b>
+      <input class="${inputCls} text-xs" value="${esc(z.network)}" onchange="save('zones',${z.id},'network',this.value)">
+      <select class="${inputCls} text-xs" onchange="save('zones',${z.id},'mode',this.value)">${opt(MODES_ORDER, z.mode)}</select>
+      ${S.zone === z.name ? `<span class="text-xs rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 px-2">here now</span>` : ""}
+      <button class="ml-auto text-slate-400 hover:text-red-600" onclick="del('zones',${z.id})">✕</button></div>`).join("");
+
+  const days = ["M", "T", "W", "T", "F", "S", "S"];
+  const sch = await api("/api/schedules");
+  document.getElementById("sched-body").innerHTML = sch.map(s => `
+    <div class="flex flex-wrap items-center gap-2 rounded-xl bg-slate-50 dark:bg-slate-800/50 p-2">
+      <input type="checkbox" ${s.enabled ? "checked" : ""} onchange="save('schedules',${s.id},'enabled',this.checked?1:0)">
+      <span class="text-lg">${S.modes[s.mode]?.icon || ""}</span><b class="w-28">${esc(s.name)}</b>
+      <select class="${inputCls} text-xs" onchange="save('schedules',${s.id},'mode',this.value)">${opt(["school", "homework", "downtime", "strict"], s.mode)}</select>
+      <input type="time" class="${inputCls} text-xs" value="${s.start}" onchange="save('schedules',${s.id},'start',this.value)">–
+      <input type="time" class="${inputCls} text-xs" value="${s.end}" onchange="save('schedules',${s.id},'end',this.value)">
+      <span class="flex gap-0.5">${days.map((d, i) => `<button class="w-6 h-6 rounded text-xs ${s.days.includes(i) ? "bg-indigo-600 text-white" : "bg-slate-200 dark:bg-slate-700"}"
+        onclick="toggleDay(${s.id},'${s.days}',${i})">${d}</button>`).join("")}</span>
+      <button class="ml-auto text-slate-400 hover:text-red-600" onclick="del('schedules',${s.id})">✕</button></div>`).join("");
+
+  document.getElementById("mode-help").innerHTML = Object.entries(S.modes).map(([k, m]) => `
+    <div class="rounded-xl bg-slate-50 dark:bg-slate-800/50 p-3"><b>${m.icon} ${esc(m.label)}</b><p class="text-xs text-slate-500 mt-1">${esc(m.about)}</p>
+    <p class="text-xs mt-1">Pauses: ${m.apps.length ? m.apps.join(", ") : "nothing extra"}</p></div>`).join("");
+}
+function toggleDay(id, days, i) {
+  const s = new Set(days.split("")); s.has(String(i)) ? s.delete(String(i)) : s.add(String(i));
+  save("schedules", id, "days", [...s].sort().join(""));
+}
+
+async function renderRequests() {
+  const reqs = await api("/api/requests");
+  const what = r => r.kind === "more_time" ? `+${r.minutes} min of <b>${esc(r.target)}</b>` : r.kind === "unblock_site" ? `visit <b>${esc(r.target)}</b>` : `open <b>${esc(r.target)}</b>`;
+  document.getElementById("req-list").innerHTML = reqs.map(r => `
+    <div class="card flex flex-wrap items-center gap-3 text-sm">
+      <span class="text-xl">🙋</span><div class="flex-1"><div>${esc(S.child.name)} asks for ${what(r)}</div><div class="text-xs text-slate-500">“${esc(r.reason || "no reason given")}” · ${r.ts_h}</div></div>
+      ${r.status === "pending" ? `<button onclick="decideReq(${r.id},true)" class="rounded-lg bg-emerald-600 text-white px-3 py-1.5">Approve</button>
+        <button onclick="decideReq(${r.id},false)" class="rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-1.5">Deny</button>`
+        : `<span class="text-xs rounded-full px-2 py-0.5 ${r.status === "approved" ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300" : "bg-slate-100 dark:bg-slate-800"}">${r.status}</span>`}
+    </div>`).join("") || `<p class="text-sm text-slate-500">No requests yet.</p>`;
+}
+async function decideReq(id, approve) {
+  const r = await api(`/api/requests/${id}/decide`, { method: "POST", body: { approve } });
+  toast(r.result); refresh();
+}
+
+let settingsBound = false;
+function renderSettings() {
+  const c = S.child;
+  if (!settingsBound) {
+    settingsBound = true;
+    const put = (body) => api("/api/child", { method: "PUT", body }).then(() => { toast("Saved"); refresh(); });
+    document.getElementById("set-name").onchange = e => put({ name: e.target.value });
+    document.getElementById("set-age").onchange = e => put({ age_group: e.target.value });
+    document.getElementById("set-auto").onchange = e => put({ auto_block: e.target.checked ? 1 : 0 });
+    document.getElementById("set-consent").onchange = e => put({ ai_consent: e.target.checked ? 1 : 0 });
+  }
+  if (document.activeElement?.id !== "set-name") document.getElementById("set-name").value = c.name;
+  document.getElementById("set-age").value = c.age_group;
+  document.getElementById("set-auto").checked = !!c.auto_block;
+  document.getElementById("set-consent").checked = !!c.ai_consent;
+  const ai = S.ai;
+  document.getElementById("set-ai").innerHTML = `<b>AI (Groq)</b>: ${ai.enabled ? "🟢 connected" : "⚪ offline keyword mode — add GROQ_API_KEY"}
+    <div class="text-xs text-slate-500">Vision: ${esc(ai.vision_model)} · Safety: ${esc(ai.safety_model)}</div>
+    ${ai.last_error ? `<div class="text-xs text-red-600 mt-1">Last error: ${esc(ai.last_error)}</div>` : ""}`;
+  const tg = S.telegram;
+  document.getElementById("set-tg").innerHTML = `<b>Telegram</b>: ${!tg.enabled ? "⚪ add TELEGRAM_BOT_TOKEN" : tg.linked ? "🟢 linked" : "🟡 send /start to your bot to link"}`;
+  const ag = S.agent || {};
+  document.getElementById("set-agent").innerHTML = `<b>Agent</b>: ${S.online ? "🟢 online" : "⚪ offline"} ${ag.hostname ? `· ${esc(ag.hostname)} (${esc(ag.platform)})` : ""}
+    <div class="text-xs text-slate-500">Site blocking: ${esc(ag.site_blocking || "unknown")}</div>`;
+}
+
+document.getElementById("report-btn").onclick = async () => {
+  const el = document.getElementById("report"); el.textContent = "Writing digest…";
+  el.textContent = (await api("/api/report")).report;
+};
+
+let busy = false;
+async function refresh() {
+  if (busy) return; busy = true;
+  try {
+    S = await api("/api/state");
+    renderHeader();
+    if (current === "overview") await renderOverview();
+    if (current === "alerts") await renderAlerts();
+    if (current === "rules") await renderRules();
+    if (current === "zones") await renderZones();
+    if (current === "requests") await renderRequests();
+    if (current === "settings") renderSettings();
+  } catch (e) { console.error(e); } finally { busy = false; }
+}
+document.querySelectorAll(".mode-select").forEach(s => s.innerHTML = opt(MODES_ORDER, "home"));
+document.querySelectorAll(".cat-select").forEach(s => s.innerHTML = opt(CATS, "game"));
+let startTab = "overview"; try { startTab = localStorage.getItem("guardian-tab") || "overview"; } catch (e) {}
+showTab(startTab);
+// Auto-refresh only views that don't contain inputs being edited.
+setInterval(() => { if (["overview", "alerts", "requests"].includes(current)) refresh(); else api("/api/state").then(s => { S = s; renderHeader(); }); }, 4000);
+</script>
+</body>
+</html>
